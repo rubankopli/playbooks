@@ -1,0 +1,75 @@
+
+
+- name: Core functionality
+  hosts: all
+  become: yes
+  vars:
+    core_packages:
+      - fish # User-friendly interactive shell
+      - tmux # Terminal multiplexer for managing multiple terminal sessions
+    
+    core_utilities:
+
+      file_management:
+        - atool # Unified interface for managing various archive types
+        - broot # Interactive and intuitive file navigation tool
+        - exa # Modern replacement for ls with Git integration
+        - fd # Simple and fast alternative to find
+        - mmv # Mass move and rename files
+        - ncdu # Interactive disk usage analyzer
+        - ripgrep # Fast, recursive content search within files
+        - rsync # Robust tool for syncing files and directories
+        - sd # Fast and user-friendly search-and-replace tool
+        - tig # Text-mode interface for Git repositories
+        - trash-cli # Safe deletion of files by moving them to the trash can
+      
+      text_viewing_and_editing:
+        - bat # Enhanced file viewer with syntax highlighting and Git integration
+        - delta # Improved readability of diff outputs
+        - jq # Powerful tool for processing and manipulating JSON data
+        - tldr # Simplified and practical command examples
+
+      system_monitoring:
+        - dust # Visual disk usage analyzer
+        - gotop # Graphical system monitoring tool
+        - htop # Advanced interactive process viewer
+        - mtr # Combines ping and traceroute for network diagnostics
+        - procs # Modern alternative to ps for process information
+        - ss # Advanced socket statistics
+        - watch # Runs commands periodically and shows output
+
+      networking:
+        - curl # Versatile tool for transferring data with URLs
+        - httpie # User-friendly HTTP client for interacting with APIs
+        - ip # Network configuration and management tool
+
+      development_and_scripting:
+        - cheat # Customizable cheat sheets for various commands
+        - devdocs # Extensive documentation for programming languages and tools
+        - entr # Runs arbitrary commands when files change
+        - grc # Colorizes output of various commands for better readability
+        - hyperfine # Command-line benchmarking tool
+        - tqdm # Progress bars for command-line tasks
+
+    gui_utilities:
+      - gotop # Graphical system monitoring tool
+
+    user_utilities:
+      - delta # Improved readability of diff outputs
+      - entr # Runs arbitrary commands when files change
+
+    core_services:
+      - snapclient # Snapcast client for multi-room audio
+
+
+
+  tasks:
+    - name: Update Package Lists
+      apt:
+        update_cache: yes
+      dnf:
+        update_cache: yes
+
+  # TODO!
+
+

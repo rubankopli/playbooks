@@ -1,0 +1,22 @@
+- name: Personal PC Setup
+  hosts: personal_pc
+  become: yes
+  vars:
+    user_name: "rkopli"
+    user_password: "{{ 'mypassword' | password_hash('sha512') }}"
+
+    gui_system_utilities:
+      - gotop
+
+    gui_user_programs:
+      - code
+      - discord
+      - firefox
+      - kitty
+
+    vscode_extensions:
+      - ms-python.python
+      - ms-vscode.cpptools
+
+  # tasks: TODO!
+
