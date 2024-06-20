@@ -13,7 +13,7 @@
       file_management:
         - atool # Unified interface for managing various archive types
         - broot # Interactive and intuitive file navigation tool
-        - exa # Modern replacement for ls with Git integration
+        - eza # Modern replacement for ls with Git integration
         - fd # Simple and fast alternative to find
         - mmv # Mass move and rename files
         - ncdu # Interactive disk usage analyzer
