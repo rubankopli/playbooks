@@ -1,0 +1,12 @@
+
+- name: shell_config
+  hosts: all
+  become: no
+  vars:
+    fish_default:
+      file: "/etc/shells"
+      line: "/usr/bin/fish"
+      command: "chsh -s /usr/bin/fish"
+    
+
+
