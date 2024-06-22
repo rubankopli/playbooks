@@ -28,6 +28,7 @@
         - delta # Improved readability of diff outputs
         - jq # Powerful tool for processing and manipulating JSON data
         - tldr # Simplified and practical command examples
+        - ov # Enhanced pager alternative to 'less'
 
       system_monitoring:
         - dust # Visual disk usage analyzer
@@ -61,7 +62,14 @@
     core_services:
       - snapclient # Snapcast client for multi-room audio
 
-
+  
+- name: fish_config
+  hosts: all
+  become: no
+  vars:
+    pager_config:
+      - "set -Ux PAGER ov"
+      - "set -Ux MANPAGER ov"
 
   tasks:
     - name: Update Package Lists
