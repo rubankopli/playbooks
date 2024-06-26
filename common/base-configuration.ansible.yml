@@ -62,15 +62,6 @@
     core_services:
       - snapclient # Snapcast client for multi-room audio
 
-  
-- name: fish_config
-  hosts: all
-  become: no
-  vars:
-    pager_config:
-      - "set -Ux PAGER ov"
-      - "set -Ux MANPAGER ov"
-
   tasks:
     - name: Update Package Lists
       apt:

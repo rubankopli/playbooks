@@ -1,0 +1,14 @@
+# Fish shell environment configuration
+
+- name: Global Environment Variables
+  hosts: all
+  become: yes
+  vars:
+    pager:
+      - "set -Ux PAGER ov"
+      - "set -Ux MANPAGER ov"
+      
+- name: Local Environment Variables
+  hosts: all
+  become: no
+  vars:
