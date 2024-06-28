@@ -1,0 +1,18 @@
+
+
+- name: kitty-terminal-install
+  hosts: all
+  become: yes
+  vars:
+    install-kitty:
+      install-command: "curl -L https://sw.kovidgoyal.net/kitty/installer.sh | sh /dev/stdin"
+      mv-install-dir: "mv -R ~/.local/kitty.app/ /usr/local/"
+      # TODO: Move all the files under 'kitty.app' to the actual right locations (e.g. ...kitty.app/bin to the appropriate bin directory)
+      create-symbolic-links: "ln -sf /usr/local/kitty.app/bin/kitty /usr/local/kitty.app/bin/kitten /usr/local/bin/" 
+      move-desktop-file-1: "cp /usr/local/kitty.app/share/applications/kitty.desktop /usr/share/applications/"
+      move-desktop-file-2: "cp /usr/local/kitty.app/share/applications/kitty-open.desktop /usr/share/applications/"
+      # Probably need to fix these
+      update-desktop-icon-paths: "sed -i "s|Icon=kitty|Icon=$(readlink -f ~)/.local/kitty.app/share/icons/hicolor/256x256/apps/kitty.png|g" /usr/share/applications/kitty*.desktop"
+      update-desktop-exec-paths: "sed -i "s|Exec=kitty|Exec=$(readlink -f ~)/.local/kitty.app/bin/kitty|g" /usr/share/applications/kitty*.desktop"
+      update-xdg-terminal: "echo 'kitty.desktop' > ~/.config/xdg-terminals.list" # probably don't need this
+      update-alternatives: "update-alternatives --install /usr/bin/x-terminal-emulator x-terminal-emulator /usr/local/kitty.app/bin/kitty"
