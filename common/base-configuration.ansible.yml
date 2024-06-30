@@ -7,7 +7,21 @@
     core_packages:
       - fish # User-friendly interactive shell
       - tmux # Terminal multiplexer for managing multiple terminal sessions
-    
+
+      - nix-env # Nix package management (use this for non-system/non-core packages)
+
+      # - fisher
+      # - fzf # fisher install patrickf1/fzf.fish
+      # - z # fisher install jethrokuan/z
+      # - autojump
+      # - thefuck # or sponge?
+
+      # - tmuxinator
+      # - tpm
+      # - tmux-resurrect
+      # - tmux-continuum
+      # - tmux-yank
+
     core_utilities:
 
       file_management:
@@ -29,10 +43,10 @@
         - jq # Powerful tool for processing and manipulating JSON data
         - tldr # Simplified and practical command examples
         - ov # Enhanced pager alternative to 'less'
+        - shellcheck # Linting for bash scripts
 
       system_monitoring:
         - dust # Visual disk usage analyzer
-        - gotop # Graphical system monitoring tool
         - htop # Advanced interactive process viewer
         - mtr # Combines ping and traceroute for network diagnostics
         - procs # Modern alternative to ps for process information
@@ -47,7 +61,6 @@
       development_and_scripting:
         - cheat # Customizable cheat sheets for various commands
         - devdocs # Extensive documentation for programming languages and tools
-        - entr # Runs arbitrary commands when files change
         - grc # Colorizes output of various commands for better readability
         - hyperfine # Command-line benchmarking tool
         - tqdm # Progress bars for command-line tasks
@@ -56,7 +69,6 @@
       - gotop # Graphical system monitoring tool
 
     user_utilities:
-      - delta # Improved readability of diff outputs
       - entr # Runs arbitrary commands when files change
 
     core_services:

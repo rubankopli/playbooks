@@ -14,6 +14,9 @@
       - firefox
       - kitty
 
+    tui-system-utilities:
+      - docker-ce
+
     tui_user_programs:
       - spotify-tui
 
