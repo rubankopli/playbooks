@@ -1,0 +1,13 @@
+# Fish shell completions
+
+- name: fish-completions
+  hosts: all
+  become: no
+  vars:
+    functions:
+      - name: ""
+
+    python-argcomplete:
+      - command: "register-python-argcomplete --shell fish $SCRIPT_NAME" # TODO SCRIPT_NAME var
+      - pip-completion: "pip completion --fish"
+      

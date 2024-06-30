@@ -1,8 +1,8 @@
-
-
+# Base configuration for all systems
+#
 - name: Core functionality
   hosts: all
-  become: yes
+  become: true
   vars:
     core_packages:
       - fish # User-friendly interactive shell
@@ -36,7 +36,7 @@
         - sd # Fast and user-friendly search-and-replace tool
         - tig # Text-mode interface for Git repositories
         - trash-cli # Safe deletion of files by moving them to the trash can
-      
+
       text_viewing_and_editing:
         - bat # Enhanced file viewer with syntax highlighting and Git integration
         - delta # Improved readability of diff outputs
@@ -76,11 +76,6 @@
 
   tasks:
     - name: Update Package Lists
-      apt:
-        update_cache: yes
-      dnf:
-        update_cache: yes
-
+      ansible.builtin.apt:
+        update_cache: true
   # TODO!
-
-
