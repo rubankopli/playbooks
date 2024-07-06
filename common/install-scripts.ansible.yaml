@@ -9,7 +9,7 @@
       install_command: "curl -L https://sw.kovidgoyal.net/kitty/installer.sh | sh /dev/stdin"
       mv_install_dir: "mv -R ~/.local/kitty.app/ /usr/local/"
       # TODO: Move all the files under 'kitty.app' to the actual right locations (e.g. ...kitty.app/bin to the appropriate bin directory)
-      create_symbolic_links: "ln -sf /usr/local/kitty.app/bin/kitty /usr/local/kitty.app/bin/kitten /usr/local/bin/" 
+      create_symbolic_links: "ln -sf /usr/local/kitty.app/bin/kitty /usr/local/kitty.app/bin/kitten /usr/local/bin/"
       move_desktop_file-1: "cp /usr/local/kitty.app/share/applications/kitty.desktop /usr/share/applications/"
       move_desktop_file-2: "cp /usr/local/kitty.app/share/applications/kitty-open.desktop /usr/share/applications/"
       # Probably need to fix these
@@ -18,16 +18,25 @@
       update_xdg_terminal: "echo 'kitty.desktop' > ~/.config/xdg-terminals.list" # probably don't need this
       update_alternatives: "update-alternatives --install /usr/bin/x-terminal-emulator x-terminal-emulator /usr/local/kitty.app/bin/kitty"
 
-
+    install_fish:
+      # TODO
+      # sudo apt-add-repository ppa:fish-shell/release-3
+      # sudo apt update && sudo apt install fish
 
     install_eza:
       # TODO:
       # Need to grab from repo releases or nix
+
+    install_ov:
+      # TODO
+      # curl -L -O https://github.com/noborus/ov/releases/download/vx.x.x/ov_x.x.x-1_amd64.deb
+      # sudo dpkg -i ov_x.x.x-1_amd64.deb
+      # Currently the latest release is 0.35.0 - do the following in the directory you want to download the .apk to
+      install_command: "curl -L -O https://github.com/noborus/ov/releases/download/v0.35.0/ov_0.35.0-1_amd64.deb && sudo apt install ./ov_0.35.0-1_amd64.deb"
+
 
     install_docker:
       # TODO:
       # package manager install of docker-ce
       # for ubuntu need to add an apt repository and gpg key
       add_usergroup: "sudo usermod -aG docker ${USER}" # TODO: update $USER variable?
-      
-
