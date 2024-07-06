@@ -216,16 +216,17 @@ KeyBind:
         - "j"
 
 Mode:
+  bash:
+    AlternateRows: true
+    LineNumMode: true
+
+  man:
+    SectionDelimiter: "^[A-Z]"
+
   markdown:
     SectionDelimiter: "^#"
     WrapMode: true
-  psql:
-    Header: 2
-    AlternateRows: true
-    ColumnMode: true
-    LineNumMode: false
-    WrapMode: true
-    ColumnDelimiter: "|"
+
   mysql:
     Header: 3
     AlternateRows: true
@@ -233,5 +234,11 @@ Mode:
     LineNumMode: false
     WrapMode: true
     ColumnDelimiter: "|"
-  man:
-    SectionDelimiter: "^[A-Z]"
+
+  psql:
+    Header: 2
+    AlternateRows: true
+    ColumnMode: true
+    LineNumMode: false
+    WrapMode: true
+    ColumnDelimiter: "|"
