@@ -1,0 +1,27 @@
+
+
+# Font list
+# https://github.com/ryanoasis/nerd-fonts/
+
+# Anonymous Pro
+# Intel One Mono # min fatigue
+# Jetbrains Mono
+# Lilex # ligatures
+# Mensch # programming?
+# MesloLG
+# Monaspace Neon { }
+# Roboto Mono
+# Source Code Pro
+# Space Mono
+# Ubuntu Mono
+
+# FixedSys # 1984
+# GNU Unifont # 1998
+
+# { } < > -> => == === != !== <= >= || && 00
+# 5 > 6
+# 6 != 7
+# 7 >= 8
+
+# Move fonts to /usr/share/fonts/truetype/fontname/...
+# Then run sudo fc-cache -f -v
