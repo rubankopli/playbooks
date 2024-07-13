@@ -1,0 +1,101 @@
+# Install commands for the packages listed in the package inventory
+
+- name: Install packages
+  hosts: all
+  become: true
+  vars_files:
+    - package-inventory.ansible.yml
+
+  tasks:
+    - name: Install eget # eget is a prerequisite for installing the github_binary packages
+      ansible.builtin.shell:
+        cmd: "curl -o eget.sh https://zyedidia.github.io/eget.sh | sh"
+        creates: "/usr/local/bin/eget"
+        # https://github.com/zyedidia/eget/blob/master/DOCS.md to see target rules
+        # set EGET_BIN to decide where eget puts the binaries
+
+    - name: Install core packages
+      ansible.builtin.package:
+        name: "{{ core_packages }}"
+        state: present
+
+    - name: Install file management utilities
+      ansible.builtin.package:
+        name: "{{ core_utilities.file_management }}"
+        state: present
+
+    - name: Install text viewing and editing utilities
+      ansible.builtin.package:
+        name: "{{ core_utilities.text_viewing_and_editing }}"
+        state: present
+
+    - name: Install GUI utilities
+      ansible.builtin.package:
+        name: "{{ gui_utilities }}"
+        state: present
+
+    - name: Install user utilities
+      ansible.builtin.package:
+        name: "{{ user_utilities }}"
+        state: present
+
+    - name: Install core services
+      ansible.builtin.package:
+        name: "{{ core_services }}"
+        state: present
+
+
+
+
+
+
+### sample to clean up and use later
+
+- name: Install packages
+  hosts: all
+  become: true
+  vars_files:
+    - package_inventory.yml
+
+  tasks:
+    - name: Determine system architecture, OS vendor, and libc
+      ansible.builtin.set_fact:
+        arch: "{{ 'aarch64' if ansible_architecture == 'arm64' else 'x86_64' }}"
+        os_vendor: "unknown-linux"
+        libc: "{{ 'musl' if ansible_os_family == 'Alpine' else 'gnu' }}"
+
+    - name: Get latest release URL
+      ansible.builtin.uri:
+        url: "https://github.com/{{ item.url.split('/')[3] }}/{{ item.url.split('/')[4] }}/releases/latest"
+        method: GET
+        status_code: 302
+        follow_redirects: none
+      register: release_redirect
+      loop: "{{ github_packages }}"
+
+    - name: Extract version from redirect URL
+      ansible.builtin.set_fact:
+        github_packages: "{{ github_packages | map('combine', {'latest_version': item.location | regex_search('/releases/tag/(.+)$') | regex_replace('/releases/tag/', '')}) | list }}"
+      loop: "{{ release_redirect.results }}"
+
+    - name: Install GitHub packages
+      block:
+        - name: Set package URL
+          ansible.builtin.set_fact:
+            package_url: >-
+              {{ item.url | replace('{version}', item.latest_version) | 
+                            replace('{arch}', arch) | 
+                            replace('{os_vendor}', os_vendor) | 
+                            replace('{libc}', libc) }}
+
+        - name: Download package
+          ansible.builtin.get_url:
+            url: "{{ package_url }}"
+            dest: "/tmp/{{ item.name }}.tar.gz"
+
+        # ... rest of the installation tasks ...
+
+      loop: "{{ github_packages }}"
+      when: github_packages is defined
+
+### end sample
