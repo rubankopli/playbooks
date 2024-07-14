@@ -5,14 +5,58 @@
   become: true
   vars_files:
     - package-inventory.ansible.yml
+  vars:
+    deb_architecture_map: { 
+      "armv6l": "arm", 
+      "armv7l": "arm", 
+      "aarch64": "arm64", 
+      "x86_64": "amd64", 
+      "i386": "386" 
+    }
 
   tasks:
-    - name: Install eget # eget is a prerequisite for installing the github_binary packages
-      ansible.builtin.shell:
-        cmd: "curl -o eget.sh https://zyedidia.github.io/eget.sh | sh"
-        creates: "/usr/local/bin/eget"
-        # https://github.com/zyedidia/eget/blob/master/DOCS.md to see target rules
-        # set EGET_BIN to decide where eget puts the binaries
+    - name: Set deb style architecture name
+      ansible.builtin.set_fact:
+        deb_arch: "{{ [ansible_architecture] | map('extract', deb_architecture_map) }}"
+
+    - name: Set lib type
+      block:
+      - name: Check for gnu libc
+        ansible.builtin.command:
+          cmd: which ldd
+        register: ldd_check
+        ignore_errors: yes
+        changed_when: false
+
+      - name: Check for musl libc
+        ansible.builtin.command:
+          cmd: which musl
+        register: musl_check
+        ignore_errors: yes
+        changed_when: false
+
+      - name: Set libc variable
+        ansible.builtin.set_fact:
+          libc: "{{ 'gnu' if ldd_check.rc == 0 else 'musl' if musl_check.rc == 0 else 'unknown' }}"
+
+    - name: Install eget # we use eget to make installing bin a bit easier, and bin to install and manage github binary releases
+      block:
+        - name: Get latest eget version redirect url
+          ansible.builtin.get_url:
+            url: https://github.com/zyedidia/eget/releases/latest
+          register: release_info
+
+        - name: Get version number from redirected url
+          ansible.builtin.set_fact:
+            latest_version: "{{ release_info.url.split('/')[-1] | regex_replace('^v', '') }}"
+
+        - name: Download eget
+          ansible.builtin.get_url:
+            url: "https://github.com/zyedidia/eget/releases/tag/v{{ latest_version }}/eget-{{ latest_version }}-{{ ansible_system | lower }}_{{ deb_arch }}.tar.gz"
+            dest: "/usr/local/bin/"
+          # https://github.com/zyedidia/eget/blob/master/DOCS.md to see target rules
+          # set EGET_BIN to decide where eget puts the binaries
+      
 
     - name: Install core packages
       ansible.builtin.package:

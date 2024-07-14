@@ -5,6 +5,20 @@
 # os_vendor may be: unknown-linux, linux-android, pc-windows, unknown-netbsd
 # libc may be: gnu or musl on unknown-linux only, otherwise best to ignore
 
+# TODO: Consider using `bin` instead of eget? https://github.com/marcosnils/bin
+
+# Wishlist
+# - pastel
+# - lolcat
+#   cpp:
+#   - ccache (ccache.dev)
+#   - colorgcc
+#   - ninja
+#   - cope
+# - topgrade
+# - a todo list, maybe integrated with tmux?
+# - maybe consider just setting up emacs lul
+
 - name: Package Inventory
   hosts: all
   become: true
@@ -23,14 +37,14 @@
           install_method: package_manager
 
         - name: broot # Interactive and intuitive file navigation tool
-          install_method: eget # consider eget github release + extract the binary?
-          url: https://dystroy.org/broot/download/{arch}-{os_vendor}-{libc}/broot
+          install_method: eget
+          url: https://dystroy.org/broot/download/{deb_arch}-{os_vendor}-{libc}/broot
           fish-completions: https://dystroy.org/broot/download/completion/br.fish
 
         - name: eza # Modern replacement for ls with Git integration
-          install_method: download_github_archive
-          url: https://github.com/eza-community/eza/releases/download/{version}/eza_{arch}-{os_vendow}-{libc}.tar.gz
-          man_url: https://github.com/eza-community/eza/releases/download/{version}/man-{version}.tar.gz
+          install_method: eget
+          repo: eza-community/eza
+          eget_man: true
 
         - name: fd # Simple and fast alternative to find
           install_method: package_manager
@@ -45,8 +59,9 @@
           install_method: package_manager
 
         - name: sd # Fast and user-friendly search-and-replace tool
-          install_method: download_github_archive
-          url: https://github.com/chmln/sd/releases/download/{version}/sd-{version}-{arch}-{os_vendor}-{libc}.tar.gz
+          install_method: eget
+          repo: chmln/sd
+          filter_libc: true
 
         - name: tig # Text-mode interface for Git repositories
           install_method: package_manager
@@ -68,57 +83,48 @@
         - name: cheat.sh # Crowd-sourced cheat sheets for CLI commands
           install_method: download_binary
           url: https://cheat.sh/
-          configuration_location_variable: "CHTSH_CONF"
+          configuration_file_location_variable: "CHTSH_CONF"
 
         - name: ov # Enhanced pager alternative to 'less'
-          install_method: download_github_package
-          url: https://github.com/noborus/ov/releases/download/{version}/ov-{version}_{arch}.{pkg_type}
-          arch_map:
-            x86_64: "amd64"
-            i386: "386"
-            armv6l: "arm"
-            armv7l: "arm"
-            aarch64: "arm64"
+          install_method: eget
+          repo: noborus/ov
 
         - name: shellcheck # Linting for bash scripts
           install_method: package_manager
 
-
       system_monitoring:
         - name: dust # Visual disk usage analyzer
-          install_method: download_github_archive
-          url: https://github.com/bootandy/dust/releases/download/{version}/du-dust-{version}-{os_vendor}-{libc}.{platform_archive_format}
+          install_method: eget
+          filter-libc: true
 
         - name: htop # Advanced interactive process viewer
+          install_method: package_manager
+
+        - name: btop # Prettier tui resource monitor
           install_method: package_manager
 
         - name: mtr # Combines ping and traceroute for network diagnostics
           install_method: package_manager
 
         - name: procs # Modern alternative to ps for process information
-          install_method: download_github_archive
-          url: https://github.com/dalance/procs/releases/download/{version}/procs-{version}-{arch}-{os}.zip
+          install_method: eget
+          repo: danlance/procs
 
       networking:
         - name: curl # Versatile tool for transferring data with URLs
           install_method: package_manager
 
         - name: curlie # User-friendly frontend for curl using httpie-style syntax
-          install_method: eget_pkg
-          eget_options: "-a deb"
-
-        - name: ip # Network configuration and management tool
-          install_method: package_manager
+          install_method: eget
+          repo: rs/curlie
+          filter: "-a tar.gz" # should maybe update to filter-package: true with tar.gz fallback?
 
       development_and_scripting:
-        - name: devdocs # Extensive documentation for programming languages and tools
-          install_method: package_manager
-        - name: grc # Colorizes output of various commands for better readability
-          install_method: package_manager
         - name: hyperfine # Command-line benchmarking tool
           install_method: package_manager
+
         - name: tqdm # Progress bars for command-line tasks
-          install_method: package_manager
+          install_method: pip
 
     utility_services:
       - name: snapclient # Snapcast client for multi-room audio
@@ -126,9 +132,7 @@
 
     gui_utilities:
       - name: kitty # highly-configurable GUI- accelerated terminal emulator
-        install_method:
-      - name: gotop # Graphical system monitoring tool
-        install_method: package_manager
+        install_method: package_manager # Consider using the install script instead for more up to date version
 
     user_utilities:
       - name: entr # Runs arbitrary commands when files change
@@ -150,4 +154,3 @@
         - tmux-resurrect
         - tmux-continuum
         - tmux-yank
-
