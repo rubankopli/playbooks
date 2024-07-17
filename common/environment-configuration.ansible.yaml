@@ -1,12 +1,9 @@
-
-- name: shell_config
+---
+- name: Shell Configuration
   hosts: all
-  become: no
+  become: true
   vars:
     fish_default:
-      file: "/etc/shells"
-      line: "/usr/bin/fish"
-      command: "chsh -s /usr/bin/fish"
-    
-
-
+      file: /etc/shells
+      line: /usr/bin/fish
+      command: chsh -s /usr/bin/fish

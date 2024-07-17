@@ -5,8 +5,6 @@
 # os_vendor may be: unknown-linux, linux-android, pc-windows, unknown-netbsd
 # libc may be: gnu or musl on unknown-linux only, otherwise best to ignore
 
-# TODO: Consider using `bin` instead of eget? https://github.com/marcosnils/bin
-
 # Wishlist
 # - pastel
 # - lolcat
@@ -18,6 +16,9 @@
 # - topgrade
 # - a todo list, maybe integrated with tmux?
 # - maybe consider just setting up emacs lul
+
+
+# Packages within each category are arranged alphabetically
 
 - name: Package Inventory
   hosts: all
@@ -38,12 +39,18 @@
 
         - name: broot # Interactive and intuitive file navigation tool
           install_method: eget
-          url: https://dystroy.org/broot/download/{deb_arch}-{os_vendor}-{libc}/broot
+          target: https://dystroy.org/broot/download/{{ deb_arch }}-{{ os_vendor}}-{{ libc }}/broot
           fish-completions: https://dystroy.org/broot/download/completion/br.fish
+
+        - name: chezmoi # Configuration file synchronization across machines
+          install_method: eget
+          target: twpayne/chezmoi
+          # ! VERIFY EGET MANUALLY
+          # ? Consider using something to track version for eget packages to get updates?
 
         - name: eza # Modern replacement for ls with Git integration
           install_method: eget
-          repo: eza-community/eza
+          target: eza-community/eza
           eget_man: true
 
         - name: fd # Simple and fast alternative to find
@@ -60,8 +67,8 @@
 
         - name: sd # Fast and user-friendly search-and-replace tool
           install_method: eget
-          repo: chmln/sd
-          filter_libc: true
+          target: chmln/sd
+          filter: "{{ libc }}"
 
         - name: tig # Text-mode interface for Git repositories
           install_method: package_manager
@@ -87,7 +94,7 @@
 
         - name: ov # Enhanced pager alternative to 'less'
           install_method: eget
-          repo: noborus/ov
+          target: noborus/ov
 
         - name: shellcheck # Linting for bash scripts
           install_method: package_manager
@@ -95,7 +102,7 @@
       system_monitoring:
         - name: dust # Visual disk usage analyzer
           install_method: eget
-          filter-libc: true
+          filter: "{{ libc }}"
 
         - name: htop # Advanced interactive process viewer
           install_method: package_manager
@@ -108,7 +115,7 @@
 
         - name: procs # Modern alternative to ps for process information
           install_method: eget
-          repo: danlance/procs
+          target: danlance/procs
 
       networking:
         - name: curl # Versatile tool for transferring data with URLs
@@ -116,8 +123,8 @@
 
         - name: curlie # User-friendly frontend for curl using httpie-style syntax
           install_method: eget
-          repo: rs/curlie
-          filter: "-a tar.gz" # should maybe update to filter-package: true with tar.gz fallback?
+          target: rs/curlie
+          filter: "tar.gz"
 
       development_and_scripting:
         - name: hyperfine # Command-line benchmarking tool
@@ -137,7 +144,6 @@
     user_utilities:
       - name: entr # Runs arbitrary commands when files change
         install_method: package_manager
-
 
 
     plugins:

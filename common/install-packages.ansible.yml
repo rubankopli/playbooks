@@ -1,3 +1,4 @@
+---
 # Install commands for the packages listed in the package inventory
 
 - name: Install packages
@@ -6,44 +7,47 @@
   vars_files:
     - package-inventory.ansible.yml
   vars:
-    deb_architecture_map: { 
-      "armv6l": "arm", 
-      "armv7l": "arm", 
-      "aarch64": "arm64", 
-      "x86_64": "amd64", 
-      "i386": "386" 
+    deb_architecture_map: {
+      "armv6l": "arm",
+      "armv7l": "arm",
+      "aarch64": "arm64",
+      "x86_64": "amd64",
+      "i386": "386"
     }
 
-  tasks:
+  pre_tasks:
     - name: Set deb style architecture name
       ansible.builtin.set_fact:
         deb_arch: "{{ [ansible_architecture] | map('extract', deb_architecture_map) }}"
 
     - name: Set lib type
       block:
-      - name: Check for gnu libc
-        ansible.builtin.command:
-          cmd: which ldd
-        register: ldd_check
-        ignore_errors: yes
-        changed_when: false
+        - name: Check for gnu libc
+          ansible.builtin.command:
+            cmd: which ldd
+          register: ldd_check
+          ignore_errors: true
+          changed_when: false
 
-      - name: Check for musl libc
-        ansible.builtin.command:
-          cmd: which musl
-        register: musl_check
-        ignore_errors: yes
-        changed_when: false
+        - name: Check for musl libc
+          ansible.builtin.command:
+            cmd: which musl
+          register: musl_check
+          ignore_errors: true
+          changed_when: false
 
-      - name: Set libc variable
-        ansible.builtin.set_fact:
-          libc: "{{ 'gnu' if ldd_check.rc == 0 else 'musl' if musl_check.rc == 0 else 'unknown' }}"
+        - name: Set libc variable
+          ansible.builtin.set_fact:
+            libc: "{{ 'gnu' if ldd_check.rc == 0 else 'musl' if musl_check.rc == 0 else 'unknown' }}"
 
-    - name: Install eget # we use eget to make installing bin a bit easier, and bin to install and manage github binary releases
+    # we use eget to make installing bin a bit easier, and bin to install and manage github binary releases
+    - name: Install eget
       block:
         - name: Get latest eget version redirect url
           ansible.builtin.get_url:
             url: https://github.com/zyedidia/eget/releases/latest
+            dest: /tmp/
+            mode: 777
           register: release_info
 
         - name: Get version number from redirected url
@@ -52,94 +56,63 @@
 
         - name: Download eget
           ansible.builtin.get_url:
-            url: "https://github.com/zyedidia/eget/releases/tag/v{{ latest_version }}/eget-{{ latest_version }}-{{ ansible_system | lower }}_{{ deb_arch }}.tar.gz"
-            dest: "/usr/local/bin/"
-          # https://github.com/zyedidia/eget/blob/master/DOCS.md to see target rules
-          # set EGET_BIN to decide where eget puts the binaries
-      
+            url: >-
+                https://github.com/zyedidia/eget/releases/latest/download/
+                eget-{{ latest_version }}-{{ ansible_system | lower }}_{{ deb_arch }}.tar.gz
+            dest: /usr/local/bin/
+            mode: 754
+    # https://github.com/zyedidia/eget/blob/master/DOCS.md to see target rules
+    # set EGET_BIN to decide where eget puts the binaries
 
-    - name: Install core packages
-      ansible.builtin.package:
-        name: "{{ core_packages }}"
-        state: present
-
-    - name: Install file management utilities
-      ansible.builtin.package:
-        name: "{{ core_utilities.file_management }}"
-        state: present
-
-    - name: Install text viewing and editing utilities
-      ansible.builtin.package:
-        name: "{{ core_utilities.text_viewing_and_editing }}"
-        state: present
-
-    - name: Install GUI utilities
-      ansible.builtin.package:
-        name: "{{ gui_utilities }}"
-        state: present
-
-    - name: Install user utilities
-      ansible.builtin.package:
-        name: "{{ user_utilities }}"
-        state: present
-
-    - name: Install core services
-      ansible.builtin.package:
-        name: "{{ core_services }}"
-        state: present
-
-
-
-
-
-
-### sample to clean up and use later
-
-- name: Install packages
-  hosts: all
-  become: true
-  vars_files:
-    - package_inventory.yml
-
-  tasks:
-    - name: Determine system architecture, OS vendor, and libc
+    - name: Create package lists by install method
       ansible.builtin.set_fact:
-        arch: "{{ 'aarch64' if ansible_architecture == 'arm64' else 'x86_64' }}"
-        os_vendor: "unknown-linux"
-        libc: "{{ 'musl' if ansible_os_family == 'Alpine' else 'gnu' }}"
+        # List of all of the packages
+        package_manager_packages: >-
+          "{{
+          (core_packages + core_utilities.values() |
+          list + utility_services + gui_utilities + user_utilities) |
+          selectattr('install_method', 'equalto', 'package_manager') | list
+          }}"
+        eget_packages: >-
+          "{{
+          (core_packages + core_utilities.values() | list)
+          | selectattr('install_method', 'equalto', 'eget') | list
+          }}"
+        pip_packages: >-
+          "{{
+          (core_packages + core_utilities.values() | list) |
+          selectattr('install_method', 'equalto', 'pip') | list
+          }}"
+        download_binary_packages: >-
+          "{{
+          (core_packages + core_utilities.values() | list) |
+          selectattr('install_method', 'equalto', 'download_binary') | list
+          }}"
 
-    - name: Get latest release URL
-      ansible.builtin.uri:
-        url: "https://github.com/{{ item.url.split('/')[3] }}/{{ item.url.split('/')[4] }}/releases/latest"
-        method: GET
-        status_code: 302
-        follow_redirects: none
-      register: release_redirect
-      loop: "{{ github_packages }}"
+    tasks:
+      - name: Install packages available through package manager
+        ansible.builtin.package:
+          name: "{{ item.name }}"
+          state: present
+        loop: "{{ package_manager_packages: }}"
 
-    - name: Extract version from redirect URL
-      ansible.builtin.set_fact:
-        github_packages: "{{ github_packages | map('combine', {'latest_version': item.location | regex_search('/releases/tag/(.+)$') | regex_replace('/releases/tag/', '')}) | list }}"
-      loop: "{{ release_redirect.results }}"
+      - name: Install packages using pip
+        ansible.builtin.pip:
+          name: "{{ item.name }}"
+        loop: "{{ pip_packages }}"
 
-    - name: Install GitHub packages
-      block:
-        - name: Set package URL
-          ansible.builtin.set_fact:
-            package_url: >-
-              {{ item.url | replace('{version}', item.latest_version) | 
-                            replace('{arch}', arch) | 
-                            replace('{os_vendor}', os_vendor) | 
-                            replace('{libc}', libc) }}
+      - name: Install packages using eget
+        ansible.builtin.command:
+          cmd: >-
+            "eget
+            {{ item.filter | default(false) | ternary(' --filter' {{ item.filter }},'') }}
+            {{ item.target }}
+            {{ item.eget_man | default(false) | ternary(' && eget ' ~ {{ item.name }} ~ ' --filter man','') }}"
+        loop: "{{ eget_packages }}"
 
-        - name: Download package
-          ansible.builtin.get_url:
-            url: "{{ package_url }}"
-            dest: "/tmp/{{ item.name }}.tar.gz"
-
-        # ... rest of the installation tasks ...
-
-      loop: "{{ github_packages }}"
-      when: github_packages is defined
-
-### end sample
+      - name: Install binary download packages
+        ansible.builtin.geturl:
+          url: "{{ item.url }}"
+          dest: "/usr/local/bin//{{ item.name }}"
+          mode: 755
+        loop: "{{ download_binary_packages }}"

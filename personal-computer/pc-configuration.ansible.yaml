@@ -1,8 +1,9 @@
+---
 - name: Personal PC Setup
   hosts: personal_pc
-  become: yes
+  become: true
   vars:
-    user_name: "rkopli"
+    user_name: rkopli
     user_password: "{{ 'mypassword' | password_hash('sha512') }}"
 
     gui_system_utilities:
@@ -14,7 +15,7 @@
       - firefox
       - kitty
 
-    tui-system-utilities:
+    tui_system_utilities:
       - docker-ce
 
     tui_user_programs:
@@ -25,4 +26,3 @@
       - ms-vscode.cpptools
 
   # tasks: TODO!
-
