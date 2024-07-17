@@ -1,0 +1,124 @@
+---
+# Install commands for the packages listed in the package inventory
+
+- name: Install packages
+  hosts: all
+  become: true
+  vars_files:
+    - package-inventory.ansible.yaml
+  vars:
+    deb_architecture_map: {
+      "armv6l": "arm",
+      "armv7l": "arm",
+      "aarch64": "arm64",
+      "x86_64": "amd64",
+      "i386": "386"
+    }
+    os_vendor_map: {
+      "Linux": "unknown-linux",
+      "Windows": "pc-windows",
+    }
+
+  pre_tasks:
+    - name: Debug Temp
+      ansible.builtin.debug:
+        var: core_packages
+
+    - name: Set deb style architecture name
+      ansible.builtin.set_fact:
+        deb_arch: "{{ [ansible_architecture] | map('extract', deb_architecture_map) }}"
+
+    - name: Set os_vendor variable
+      ansible.builtin.set_fact:
+        os_vendor: "{{ [ansible_system] | map('extract', os_vendor_map) }}"
+
+    - name: Set lib type
+      block:
+        - name: Check for gnu libc
+          ansible.builtin.command:
+            cmd: which ldd
+          register: ldd_check
+          ignore_errors: true
+          changed_when: false
+
+        - name: Check for musl libc
+          ansible.builtin.command:
+            cmd: which musl
+          register: musl_check
+          ignore_errors: true
+          changed_when: false
+
+        - name: Set libc variable
+          ansible.builtin.set_fact:
+            libc: "{{ 'gnu' if ldd_check.rc == 0 else 'musl' if musl_check.rc == 0 else 'unknown' }}"
+
+    # we use eget to make installing bin a bit easier, and bin to install and manage github binary releases
+    - name: Install eget
+      block:
+        - name: Download eget install script
+          ansible.builtin.get_url:
+            url: https://zyedidia.github.io/eget.sh
+            dest: /usr/local/bin/
+            mode: 754
+
+        - name: Install curl
+          ansible.builtin.package:
+            name: "curl"
+            state: present
+
+        - name: Run eget install script
+          ansible.builtin.command:
+            cmd: /usr/local/bin/eget.sh
+          register: install_eget_return_code
+          changed_when: install_eget_return_code != 0
+
+
+    - name: Create package lists by install method
+      block:
+        - name: Create core package list
+          ansible.builtin.set_fact:
+            core_utilities_packages: "{{ core_utilities.values() | flatten | list }}"
+
+        - name: Create list of all packages from inventory
+          ansible.builtin.set_fact:
+            all_packages: "{{core_packages + core_utilities_packages + utility_services + gui_utilities + user_utilities }}"
+
+        - name: Sort packages into lists by install type
+          ansible.builtin.set_fact:
+            package_manager_packages: "{{ all_packages | selectattr('install_method', 'equalto', 'package_manager') }}"
+            eget_packages: "{{ all_packages | selectattr('install_method', 'equalto', 'eget') }}"
+            pip_packages: "{{ all_packages | selectattr('install_method', 'equalto', 'pip') }}"
+            download_binary_packages: "{{ all_packages | selectattr('install_method', 'equalto', 'download_binary') }}"
+
+  tasks:
+    - name: Install packages available through package manager
+      ansible.builtin.package:
+        name: "{{ item.name }}"
+        state: present
+      loop: "{{ package_manager_packages }}"
+
+    - name: Install packages using pip
+      ansible.builtin.pip:
+        name: "{{ item.name }}"
+      loop: "{{ pip_packages }}"
+
+    - name: Install packages using eget
+      ansible.builtin.command:
+        cmd: >-
+          eget
+          {{ item.filter | default(false) | ternary(' --filter' ~ {{ item.filter }},'') }}
+          --to /usr/local/bin/
+          {{ item.target }}
+          {{ item.eget_man | default(false) | ternary(' && eget ' ~ {{ item.name }} ~ ' --filter man','') }}
+      register: eget_return
+      changed_when: eget_return != 0
+      loop: "{{ eget_packages }}"
+
+    - name: Install binary download packages
+      ansible.builtin.get_url:
+        url: "{{ item.url }}"
+        dest: "/usr/local/bin//{{ item.name }}"
+        mode: 755
+      loop: "{{ download_binary_packages }}"
+
+      # Install chezmoi

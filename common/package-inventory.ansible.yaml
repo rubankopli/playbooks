@@ -20,143 +20,141 @@
 
 # Packages within each category are arranged alphabetically
 
-- name: Package Inventory
-  hosts: all
-  become: true
-  vars:
-    core_packages:
-      - name: fish # User-friendly interactive shell
-        install_method: package_manager
+core_packages:
+  - name: fish # User-friendly interactive shell
+    install_method: package_manager
 
-      - name: tmux # Terminal multiplexer for managing multiple terminal sessions
-        install_method: package_manager
+  - name: tmux # Terminal multiplexer for managing multiple terminal sessions
+    install_method: package_manager
 
-    core_utilities:
+core_utilities:
 
-      file_management:
-        - name: atool # Unified interface for managing various archive types
-          install_method: package_manager
+  file_management:
+    - name: atool # Unified interface for managing various archive types
+      install_method: package_manager
 
-        - name: broot # Interactive and intuitive file navigation tool
-          install_method: eget
-          target: https://dystroy.org/broot/download/{{ deb_arch }}-{{ os_vendor}}-{{ libc }}/broot
-          fish-completions: https://dystroy.org/broot/download/completion/br.fish
+    - name: broot # Interactive and intuitive file navigation tool
+      install_method: eget
+      target: https://dystroy.org/broot/download/{{ deb_arch }}-{{ os_vendor}}-{{ libc }}/broot
+      fish-completions: https://dystroy.org/broot/download/completion/br.fish
 
-        - name: chezmoi # Configuration file synchronization across machines
-          install_method: eget
-          target: twpayne/chezmoi
-          # ! VERIFY EGET MANUALLY
-          # ? Consider using something to track version for eget packages to get updates?
+    - name: chezmoi # Configuration file synchronization across machines
+      install_method: eget
+      target: twpayne/chezmoi
+      # ! VERIFY EGET MANUALLY
+      # ? Consider using something to track version for eget packages to get updates?
 
-        - name: eza # Modern replacement for ls with Git integration
-          install_method: eget
-          target: eza-community/eza
-          eget_man: true
+    - name: eza # Modern replacement for ls with Git integration
+      install_method: eget
+      target: eza-community/eza
+      eget_man: true
 
-        - name: fd # Simple and fast alternative to find
-          install_method: package_manager
+    - name: fd # Simple and fast alternative to find
+      install_method: eget
+      target: sharkdp/fd
+      filter: "{{ libc }}"
 
-        - name: mmv # Mass move and rename files
-          install_method: package_manager
+    - name: mmv # Mass move and rename files
+      install_method: package_manager
 
-        - name: ncdu # Interactive disk usage analyzer
-          install_method: package_manager
+    - name: ncdu # Interactive disk usage analyzer
+      install_method: package_manager
 
-        - name: ripgrep # Fast, recursive content search within files
-          install_method: package_manager
+    - name: ripgrep # Fast, recursive content search within files
+      install_method: package_manager
 
-        - name: sd # Fast and user-friendly search-and-replace tool
-          install_method: eget
-          target: chmln/sd
-          filter: "{{ libc }}"
+    - name: sd # Fast and user-friendly search-and-replace tool
+      install_method: eget
+      target: chmln/sd
+      filter: "{{ libc }}"
 
-        - name: tig # Text-mode interface for Git repositories
-          install_method: package_manager
+    - name: tig # Text-mode interface for Git repositories
+      install_method: package_manager
 
-        - name: trash-cli # Safe deletion of files by moving them to the trash can
-          install_method: package_manager
+    - name: trash-cli # Safe deletion of files by moving them to the trash can
+      install_method: package_manager
 
 
-      text_viewing_and_editing:
-        - name: bat # Enhanced file viewer with syntax highlighting and Git integration
-          install_method: package_manager
+  text_viewing_and_editing:
+    - name: bat # Enhanced file viewer with syntax highlighting and Git integration
+      install_method: package_manager
 
-        - name: delta # Improved readability of diff outputs
-          install_method: package_manager
+    - name: delta # Improved readability of diff outputs
+      install_method: package_manager
 
-        - name: jq # Powerful tool for processing and manipulating JSON data
-          install_method: package_manager
+    - name: jq # Powerful tool for processing and manipulating JSON data
+      install_method: package_manager
 
-        - name: cheat.sh # Crowd-sourced cheat sheets for CLI commands
-          install_method: download_binary
-          url: https://cheat.sh/
-          configuration_file_location_variable: "CHTSH_CONF"
+    - name: cheat.sh # Crowd-sourced cheat sheets for CLI commands
+      install_method: download_binary
+      url: https://cheat.sh/
+      configuration_file_location_variable: "CHTSH_CONF"
 
-        - name: ov # Enhanced pager alternative to 'less'
-          install_method: eget
-          target: noborus/ov
+    - name: ov # Enhanced pager alternative to 'less'
+      install_method: eget
+      target: noborus/ov
 
-        - name: shellcheck # Linting for bash scripts
-          install_method: package_manager
+    - name: shellcheck # Linting for bash scripts
+      install_method: package_manager
 
-      system_monitoring:
-        - name: dust # Visual disk usage analyzer
-          install_method: eget
-          filter: "{{ libc }}"
+  system_monitoring:
+    - name: dust # Visual disk usage analyzer
+      install_method: eget
+      filter: "{{ libc }}"
 
-        - name: htop # Advanced interactive process viewer
-          install_method: package_manager
+    - name: htop # Advanced interactive process viewer
+      install_method: package_manager
 
-        - name: btop # Prettier tui resource monitor
-          install_method: package_manager
+    - name: btop # Prettier tui resource monitor
+      install_method: package_manager
 
-        - name: mtr # Combines ping and traceroute for network diagnostics
-          install_method: package_manager
+    - name: mtr # Combines ping and traceroute for network diagnostics
+      install_method: package_manager
 
-        - name: procs # Modern alternative to ps for process information
-          install_method: eget
-          target: danlance/procs
+    - name: procs # Modern alternative to ps for process information
+      install_method: eget
+      target: danlance/procs
 
-      networking:
-        - name: curl # Versatile tool for transferring data with URLs
-          install_method: package_manager
+  networking:
+    - name: curl # Versatile tool for transferring data with URLs
+      install_method: package_manager
 
-        - name: curlie # User-friendly frontend for curl using httpie-style syntax
-          install_method: eget
-          target: rs/curlie
-          filter: "tar.gz"
+    - name: curlie # User-friendly frontend for curl using httpie-style syntax
+      install_method: eget
+      target: rs/curlie
+      filter: "tar.gz"
 
-      development_and_scripting:
-        - name: hyperfine # Command-line benchmarking tool
-          install_method: package_manager
+  development_and_scripting:
+    - name: hyperfine # Command-line benchmarking tool
+      install_method: package_manager
 
-        - name: tqdm # Progress bars for command-line tasks
-          install_method: pip
+    - name: tqdm # Progress bars for command-line tasks
+      install_method: pip
 
-    utility_services:
-      - name: snapclient # Snapcast client for multi-room audio
-        install_method: package_manager
+utility_services:
+  - name: snapclient # Snapcast client for multi-room audio
+    install_method: package_manager
 
-    gui_utilities:
-      - name: kitty # highly-configurable GUI- accelerated terminal emulator
-        install_method: package_manager # Consider using the install script instead for more up to date version
+gui_utilities:
+  - name: kitty # highly-configurable GUI- accelerated terminal emulator
+    install_method: package_manager # Consider using the install script instead for more up to date version
 
-    user_utilities:
-      - name: entr # Runs arbitrary commands when files change
-        install_method: package_manager
+user_utilities:
+  - name: entr # Runs arbitrary commands when files change
+    install_method: package_manager
 
 
-    plugins:
-      fish_plugins:
-        - fisher
-        - fzf # fisher install patrickf1/fzf.fish
-        - z # fisher install jethrokuan/z
-        - autojump
-        - thefuck # or sponge?
+plugins:
+  fish_plugins:
+    - fisher
+    - fzf # fisher install patrickf1/fzf.fish
+    - z # fisher install jethrokuan/z
+    - autojump
+    - thefuck # or sponge?
 
-      tmux_plugins:
-        - tmuxinator
-        - tpm
-        - tmux-resurrect
-        - tmux-continuum
-        - tmux-yank
+  tmux_plugins:
+    - tmuxinator
+    - tpm
+    - tmux-resurrect
+    - tmux-continuum
+    - tmux-yank
