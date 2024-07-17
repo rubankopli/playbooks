@@ -69,8 +69,8 @@
         - name: Run eget install script
           ansible.builtin.command:
             cmd: /usr/local/bin/eget.sh
-          register: install_eget_return_code
-          changed_when: install_eget_return_code != 0
+          register: install_eget
+          changed_when: install_eget.rc != 0
 
 
     - name: Create package lists by install method
@@ -103,16 +103,26 @@
       loop: "{{ pip_packages }}"
 
     - name: Install packages using eget
-      ansible.builtin.command:
-        cmd: >-
-          eget
-          {{ item.filter | default(false) | ternary(' --filter' ~ {{ item.filter }},'') }}
-          --to /usr/local/bin/
-          {{ item.target }}
-          {{ item.eget_man | default(false) | ternary(' && eget ' ~ {{ item.name }} ~ ' --filter man','') }}
-      register: eget_return
-      changed_when: eget_return != 0
-      loop: "{{ eget_packages }}"
+      block:
+        - name: Package installations
+          ansible.builtin.command:
+            cmd: >-
+              eget
+              {{ '--filter "' ~ item.filter ~ '"' if item.filter is defined else '' }}
+              --to /usr/local/bin/
+              {{ item.target }}
+          register: eget_return
+          changed_when: eget_return.rc != 0
+          loop: "{{ eget_packages }}"
+
+        # TODO
+        # - name: Man page installations
+        #   ansible.builtin.command:
+        #     cmd: eget {{ item.target }} --filter man --to /usr/local/share/man/{{ item.name }}//
+        #   when: item.eget_man | default(false)
+
+        # TODO
+        # Fish completions
 
     - name: Install binary download packages
       ansible.builtin.get_url:

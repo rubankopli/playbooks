@@ -100,6 +100,7 @@ core_utilities:
   system_monitoring:
     - name: dust # Visual disk usage analyzer
       install_method: eget
+      target: bootandy/dust
       filter: "{{ libc }}"
 
     - name: htop # Advanced interactive process viewer
