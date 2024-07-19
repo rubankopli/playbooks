@@ -8,11 +8,11 @@
     - package-inventory.ansible.yaml
   vars:
     deb_architecture_map: {
-      "armv6l": "arm",
-      "armv7l": "arm",
-      "aarch64": "arm64",
-      "x86_64": "amd64",
-      "i386": "386"
+      "armv6l": "arm",    #
+      "armv7l": "arm",    #
+      "aarch64": "arm64", #
+      "x86_64": "amd64",  #
+      "i386": "386"       #
     }
     os_vendor_map: {
       "Linux": "unknown-linux",
@@ -20,17 +20,13 @@
     }
 
   pre_tasks:
-    - name: Debug Temp
-      ansible.builtin.debug:
-        var: core_packages
-
     - name: Set deb style architecture name
       ansible.builtin.set_fact:
-        deb_arch: "{{ [ansible_architecture] | map('extract', deb_architecture_map) }}"
+        deb_arch: "{{ [ansible_architecture] | map('extract', deb_architecture_map) | first }}"
 
     - name: Set os_vendor variable
       ansible.builtin.set_fact:
-        os_vendor: "{{ [ansible_system] | map('extract', os_vendor_map) }}"
+        os_vendor: "{{ [ansible_system] | map('extract', os_vendor_map) | first }}"
 
     - name: Set lib type
       block:
@@ -40,6 +36,7 @@
           register: ldd_check
           ignore_errors: true
           changed_when: false
+          failed_when: false
 
         - name: Check for musl libc
           ansible.builtin.command:
@@ -47,6 +44,7 @@
           register: musl_check
           ignore_errors: true
           changed_when: false
+          failed_when: false
 
         - name: Set libc variable
           ansible.builtin.set_fact:
@@ -55,23 +53,50 @@
     # we use eget to make installing bin a bit easier, and bin to install and manage github binary releases
     - name: Install eget
       block:
+        - name: Check if eget is installed
+          ansible.builtin.command: which eget
+          register: eget_check
+          ignore_errors: true
+          changed_when: false
+          failed_when: false
+
+        - name: Check if curl is installed
+
+          ansible.builtin.command: which curl
+          register: curl_check
+          ignore_errors: true
+          changed_when: false
+          failed_when: false
+
         - name: Download eget install script
           ansible.builtin.get_url:
             url: https://zyedidia.github.io/eget.sh
-            dest: /usr/local/bin/
-            mode: 754
+            dest: /usr/local/bin/eget.sh
+            mode: u=rwx,g=rx,o=r
+          when: eget_check.rc != 0
 
         - name: Install curl
           ansible.builtin.package:
             name: "curl"
             state: present
+          when: curl_check.rc != 0
 
         - name: Run eget install script
           ansible.builtin.command:
             cmd: /usr/local/bin/eget.sh
-          register: install_eget
-          changed_when: install_eget.rc != 0
+          when: not eget_check.rc != 0
+          changed_when: true
 
+        - name: Cleanup eget.sh install script
+          ansible.builtin.command:
+            cmd: rm /usr/local/bin/eget.sh
+          when: eget_check.rc != 0
+          changed_when: true
+
+    - name: Install pip
+      ansible.builtin.package:
+        name: pip
+        state: present
 
     - name: Create package lists by install method
       block:
@@ -81,7 +106,7 @@
 
         - name: Create list of all packages from inventory
           ansible.builtin.set_fact:
-            all_packages: "{{core_packages + core_utilities_packages + utility_services + gui_utilities + user_utilities }}"
+            all_packages: "{{ core_packages + core_utilities_packages + utility_services + gui_utilities + user_utilities }}"
 
         - name: Sort packages into lists by install type
           ansible.builtin.set_fact:
@@ -104,19 +129,22 @@
 
     - name: Install packages using eget
       block:
-        - name: Package installations
+        - name: Binary eget package installations
           ansible.builtin.command:
             cmd: >-
               eget
-              {{ '--filter "' ~ item.filter ~ '"' if item.filter is defined else '' }}
+              {{ '-a "' ~ item.filter ~ '"' if item.filter is defined else '' }}
               --to /usr/local/bin/
               {{ item.target }}
           register: eget_return
-          changed_when: eget_return.rc != 0
+          changed_when: true # If this runs we're always changing the system state
+          failed_when: eget_return.rc not in [0, 2]
           loop: "{{ eget_packages }}"
+          async: 30
+          poll: 5
 
         # TODO
-        # - name: Man page installations
+        # - name: Man page eget installations
         #   ansible.builtin.command:
         #     cmd: eget {{ item.target }} --filter man --to /usr/local/share/man/{{ item.name }}//
         #   when: item.eget_man | default(false)
@@ -127,8 +155,32 @@
     - name: Install binary download packages
       ansible.builtin.get_url:
         url: "{{ item.url }}"
-        dest: "/usr/local/bin//{{ item.name }}"
-        mode: 755
+        dest: "/usr/local/bin/{{ item.name }}"
+        mode: u=rwx,g=rx,o=r
       loop: "{{ download_binary_packages }}"
 
-      # Install chezmoi
+    - name: Install custom install_method packages
+      block:
+
+        - name: Install chezmoi
+          block:
+            - name: Check if chezmoi is installed
+              ansible.builtin.command: which chezmoi
+              register: chezmoi_check
+              ignore_errors: true
+              changed_when: false
+              failed_when: false
+
+            - name: Download chezmoi install script
+              ansible.builtin.get_url:
+                url: https://get.chezmoi.io
+                dest: /tmp/get_chezmoi.sh
+                mode: u=rwx,g=rx,o=rx
+              when: chezmoi_check.rc != 0
+
+            - name: Run chezmoi install script
+              ansible.builtin.command:
+                cmd: "/tmp/get_chezmoi.sh -- init --apply rubankopli"
+              become: true
+              become_user: rkopli
+              changed_when: ("~/.local/share/chezmoi").stat.isdir is defined

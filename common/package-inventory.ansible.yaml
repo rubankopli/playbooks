@@ -15,6 +15,7 @@
 #   - cope
 # - topgrade
 # - a todo list, maybe integrated with tmux?
+# - use something besides tmux, maybe well configured kitty? alacritty + tmux?
 # - maybe consider just setting up emacs lul
 
 
@@ -35,18 +36,16 @@ core_utilities:
 
     - name: broot # Interactive and intuitive file navigation tool
       install_method: eget
-      target: https://dystroy.org/broot/download/{{ deb_arch }}-{{ os_vendor}}-{{ libc }}/broot
+      target: https://dystroy.org/broot/download/{{ ansible_architecture }}-{{ os_vendor}}-{{ libc }}/broot
       fish-completions: https://dystroy.org/broot/download/completion/br.fish
 
     - name: chezmoi # Configuration file synchronization across machines
-      install_method: eget
-      target: twpayne/chezmoi
-      # ! VERIFY EGET MANUALLY
-      # ? Consider using something to track version for eget packages to get updates?
+      install_method: custom # Installation method custom-implemented in 'Install-packages.ansible.yaml'
 
     - name: eza # Modern replacement for ls with Git integration
       install_method: eget
       target: eza-community/eza
+      filter: "{{ libc }}.tar.gz"
       eget_man: true
 
     - name: fd # Simple and fast alternative to find
@@ -74,7 +73,6 @@ core_utilities:
     - name: trash-cli # Safe deletion of files by moving them to the trash can
       install_method: package_manager
 
-
   text_viewing_and_editing:
     - name: bat # Enhanced file viewer with syntax highlighting and Git integration
       install_method: package_manager
@@ -87,7 +85,7 @@ core_utilities:
 
     - name: cheat.sh # Crowd-sourced cheat sheets for CLI commands
       install_method: download_binary
-      url: https://cheat.sh/
+      url: "http://cht.sh/:cht.sh"
       configuration_file_location_variable: "CHTSH_CONF"
 
     - name: ov # Enhanced pager alternative to 'less'
@@ -114,7 +112,7 @@ core_utilities:
 
     - name: procs # Modern alternative to ps for process information
       install_method: eget
-      target: danlance/procs
+      target: dalance/procs
 
   networking:
     - name: curl # Versatile tool for transferring data with URLs
@@ -129,8 +127,8 @@ core_utilities:
     - name: hyperfine # Command-line benchmarking tool
       install_method: package_manager
 
-    - name: tqdm # Progress bars for command-line tasks
-      install_method: pip
+    - name: python3-tqdm # Progress bars for command-line tasks
+      install_method: package_manager
 
 utility_services:
   - name: snapclient # Snapcast client for multi-room audio

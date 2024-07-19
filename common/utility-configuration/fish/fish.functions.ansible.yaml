@@ -1,14 +1,15 @@
+---
 # Fish shell custom functions 
 
-- name: fish-functions
+- name: Fish-functions
   hosts: all
-  become: no
+  become: false
   vars:
     functions:
       - name: ll
         wraps: exa
-        description: "List contents of directory using long format"
-        exec: "exa --all --long --header --icons --octal-permissions" # we will add "$argv" to the end of all function commands
+        description: List contents of directory using long format
+        exec: exa --all --long --header --icons --octal-permissions # we will add "$argv" to the end of all function commands
       - name: ""
         wraps: ""
         description: ""

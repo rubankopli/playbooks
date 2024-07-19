@@ -1,0 +1,25 @@
+- name: Test Playbook
+  hosts: test
+  gather_facts: false
+  become: true
+
+  tasks:
+    - name: Install python 3
+      ansible.builtin.package:
+        name: python3
+        state: present
+
+    - name: Install top
+      ansible.builtin.package:
+        name: htop
+        state: present
+
+    - name: Install procps
+      ansible.builtin.package:
+        name: procps
+        state: present
+
+    - name: Install shellcheck
+      ansible.builtin.package:
+        name: shellcheck
+        state: present
