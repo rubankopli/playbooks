@@ -84,7 +84,7 @@
         - name: Run eget install script
           ansible.builtin.command:
             cmd: /usr/local/bin/eget.sh
-          when: not eget_check.rc != 0
+          when: eget_check.rc != 0
           changed_when: true
 
         - name: Cleanup eget.sh install script
@@ -181,6 +181,7 @@
             - name: Run chezmoi install script
               ansible.builtin.command:
                 cmd: "/tmp/get_chezmoi.sh -- init --apply rubankopli"
+              when: chezmoi_check.rc != 0
               become: true
               become_user: rkopli
               changed_when: ("~/.local/share/chezmoi").stat.isdir is defined
