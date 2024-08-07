@@ -1,21 +1,24 @@
 # Font list
 # https://github.com/ryanoasis/nerd-fonts/
 
-# Anonymous Pro
+# Anonymous Pro # distinct 0 O o I l 1
+# Hack # dotted zero, short descenders
 # Intel One Mono # min fatigue
 # Jetbrains Mono
-# Lilex # ligatures
-# Mensch # programming?
-# MesloLG
-# Monaspace Neon { }
-# Roboto Mono
-# Source Code Pro
-# Space Mono
-# Ubuntu Mono
+# Lilex # Ligatures (using for terminal)
+# Mensch # programming? https://robey.lag.net/2010/06/21/mensch-font.html
+# MesloLG # Slashed zeros
+# Monaspace Neon #  'texture healing', 5x matching fonts
+# Roboto Mono # Dashed zero
+# Source Code Pro # Dotted zero
+# Space Mono # Squarish, dotted zero, aggressive parenthesis
+# Ubuntu Mono # Dotten zero
 
 # FixedSys # 1984
 # GNU Unifont # 1998
 
+# 0 O o I l 1 g 9 q C G Q
+# {} [] () <> ~ - +
 # { } < > -> => == === != !== <= >= || && 00
 # 5 > 6
 # 6 != 7

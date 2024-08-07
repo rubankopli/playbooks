@@ -7,3 +7,6 @@
       file: /etc/shells
       line: /usr/bin/fish
       command: chsh -s /usr/bin/fish
+
+
+# chsh fish

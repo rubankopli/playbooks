@@ -5,7 +5,7 @@
   hosts: all
   become: true
   vars_files:
-    - package-inventory.ansible.yaml
+    - package-inventory.vars.ansible.yaml
   vars:
     deb_architecture_map: {
       "armv6l": "arm",    #
@@ -130,6 +130,7 @@
     - name: Install packages using eget
       block:
         - name: Binary eget package installations
+          # TODO: Add `--upgrade-only` flag? We should ideally only run when there is an upgrade to be done
           ansible.builtin.command:
             cmd: >-
               eget

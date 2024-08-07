@@ -28,6 +28,10 @@ core_packages:
   - name: tmux # Terminal multiplexer for managing multiple terminal sessions
     install_method: package_manager
 
+  - name: zellij # Modern terminal multiplexer for managing multiple terminal sessions
+    install_method: eget
+    target: zellij-org/zellij
+
 core_utilities:
 
   file_management:
@@ -135,6 +139,7 @@ utility_services:
     install_method: package_manager
 
 gui_utilities:
+  # TODO: Update this to wezterm instead
   - name: kitty # highly-configurable GUI- accelerated terminal emulator
     install_method: package_manager # Consider using the install script instead for more up to date version
 
@@ -145,11 +150,12 @@ user_utilities:
 
 plugins:
   fish_plugins:
-    - fisher
+    - fisher # Fish plugin manager - prerequisite for the others!
     - fzf # fisher install patrickf1/fzf.fish
     - z # fisher install jethrokuan/z
     - autojump
     - thefuck # or sponge?
+    - tide # Prompt styling. fisher install ilancosman/tide@v6 (or @latest)
 
   tmux_plugins:
     - tmuxinator
