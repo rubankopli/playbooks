@@ -26,3 +26,4 @@
       - ms-vscode.cpptools
 
   # tasks: TODO!
+  # change default terminal with 'sudo update-alternatives --config x-terminal-emulator' after adding wezterm as alternative
