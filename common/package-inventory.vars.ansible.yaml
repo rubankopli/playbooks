@@ -5,6 +5,9 @@
 # os_vendor may be: unknown-linux, linux-android, pc-windows, unknown-netbsd
 # libc may be: gnu or musl on unknown-linux only, otherwise best to ignore
 
+# TODO
+# - add wezterm
+
 # Wishlist
 # - pastel
 # - lolcat
