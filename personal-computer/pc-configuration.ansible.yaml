@@ -10,10 +10,10 @@
       - gotop
 
     gui_user_programs:
-      - code
-      - discord
-      - firefox
-      - kitty
+      - vscode
+      - discord clone
+      - floorp
+      - wezterm
 
     tui_system_utilities:
       - docker-ce
