@@ -20,6 +20,7 @@
 # - a todo list, maybe integrated with tmux?
 # - use something besides tmux, maybe well configured kitty? alacritty + tmux?
 # - maybe consider just setting up emacs lul
+# - virtualfish fish plugin (https://github.com/justinmayer/virtualfish)
 
 
 # Packages within each category are arranged alphabetically
@@ -154,7 +155,11 @@ user_utilities:
 plugins:
   fish_plugins:
     - fisher # Fish plugin manager - prerequisite for the others!
+    - autopair # fisher install jorgebucaran/autopair.fish
+    - fish abbreviation tips # fisher install gazorby/fish-abbreviation-tips
     - fzf # fisher install patrickf1/fzf.fish
+    - getopts.fish # fisher install jorgebucaran/getopts.fish
+    - projectdo # fisher install paldepind/projectdo
     - z # fisher install jethrokuan/z
     - autojump
     - thefuck # or sponge?
