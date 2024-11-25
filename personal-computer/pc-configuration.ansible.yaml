@@ -28,4 +28,4 @@
   # tasks: TODO!
   # change default terminal with 'sudo update-alternatives --config x-terminal-emulator' after adding wezterm as alternative
 
-  # run chsh -s /usr/share/fish
+  # run chsh -s /usr/bin/fish
