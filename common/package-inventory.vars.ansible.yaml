@@ -25,9 +25,12 @@
 # - nvim
 # - virtualfish fish plugin (https://github.com/justinmayer/virtualfish)
 # - croc
+# - slurm
 # Personal PC:
 # - tokei
-
+# - trippy
+# - netscanner
+# - netop
 
 # Packages within each category are arranged alphabetically
 
