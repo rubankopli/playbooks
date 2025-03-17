@@ -20,9 +20,13 @@
 #   - cope
 # - topgrade
 # - a todo list, maybe integrated with tmux?
-# - use something besides tmux, maybe well configured kitty? alacritty + tmux?
-# - maybe consider just setting up emacs lul
+# - zellij
+# - helix
+# - nvim
 # - virtualfish fish plugin (https://github.com/justinmayer/virtualfish)
+# - croc
+# Personal PC:
+# - tokei
 
 
 # Packages within each category are arranged alphabetically
